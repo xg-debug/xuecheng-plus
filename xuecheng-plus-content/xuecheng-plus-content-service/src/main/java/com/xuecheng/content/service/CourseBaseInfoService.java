@@ -17,4 +17,6 @@ public interface CourseBaseInfoService {
      * @return 查询结果
      */
     PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto);
+
+
 }
