@@ -20,5 +20,12 @@ public interface TeachplanMapper extends BaseMapper<Teachplan> {
      * @param courseId
      * @return com.xuecheng.content.model.dto.TeachplanDto
      */
-    public List<TeachplanDto> selectTreeNodes(long courseId);
+    public List<TeachplanDto> selectTreeNodes(Long courseId);
+
+    /**
+     * @description 获取某个课程的课程计划的最大排序号
+     * @param courseId 课程标识
+     * @return
+     */
+    public int getMaxOrderBy(Long courseId);
 }
