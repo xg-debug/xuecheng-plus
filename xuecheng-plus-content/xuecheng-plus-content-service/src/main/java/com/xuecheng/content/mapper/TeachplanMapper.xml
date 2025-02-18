@@ -108,4 +108,23 @@
         from teachplan
         where course_id = #{courseId};
     </select>
+
+
+    <select id="findNext" resultType="com.xuecheng.content.model.po.Teachplan">
+        select * from teachplan
+        where course_id = #{courseId}
+        and grade = #{grade}
+        and orderby > #{orderby}
+        order by orderby asc
+        limit 1
+    </select>
+
+    <select id="findPrev" resultType="com.xuecheng.content.model.po.Teachplan">
+        select * from teachplan
+        where course_id = #{courseId}
+        and grade = #{grade}
+        and orderby < #{orderby}
+        order by orderby desc
+        limit 1
+    </select>
 </mapper>

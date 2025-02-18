@@ -1,7 +1,10 @@
 package com.xuecheng.content.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.xuecheng.base.exception.BusinessException;
+import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.content.mapper.TeachplanMapper;
+import com.xuecheng.content.mapper.TeachplanMediaMapper;
 import com.xuecheng.content.model.dto.SaveTeachplanDto;
 import com.xuecheng.content.model.dto.TeachplanDto;
 import com.xuecheng.content.model.po.Teachplan;
@@ -20,6 +23,9 @@ public class TeachplanServiceImpl implements TeachplanService {
 
     @Autowired
     private TeachplanMapper teachplanMapper;
+
+    @Autowired
+    private TeachplanMediaMapper teachplanMediaMapper;
 
     @Override
     public List<TeachplanDto> findTeachplanTree(Long courseId) {
@@ -53,13 +59,99 @@ public class TeachplanServiceImpl implements TeachplanService {
 
             Teachplan teachplanNew = new Teachplan();
             int maxOrderBy = teachplanMapper.getMaxOrderBy(teachplanDto.getCourseId());
-
+            // 设置排序号
             teachplanNew.setOrderby(maxOrderBy + 1);
             BeanUtils.copyProperties(teachplanDto, teachplanNew);
 
             teachplanMapper.insert(teachplanNew);
             // 新增课程之后需要请求
         }
+    }
+
+    /**
+     * 删除第一级别的大章节时要求大章节下边没有小章节时方可删除。
+     * 删除第二级别的小章节的同时需要将teachplan_media表关联的信息也删除。
+     */
+    @Transactional
+    @Override
+    public void deleteTeachplan(Long teachplanId) {
+        Teachplan teachplan = teachplanMapper.selectById(teachplanId);
+        if(teachplan == null) {
+            throw new XueChengPlusException("该课程计划不存在");
+        }
+        // 检查是否存在小章节
+        LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teachplan::getParentid, teachplanId);
+        Integer childCount = teachplanMapper.selectCount(queryWrapper);
+        if (childCount > 0) {
+            throw new BusinessException("120409", "课程计划信息还有子级信息，无法操作");
+        }
+        // 删除的是大章节
+        if(teachplan.getGrade() == 1 && childCount == 0) {
+            // 大章节下没有小章节
+            teachplanMapper.deleteById(teachplanId);
+        }
+        // 删除的是小章节
+        if(teachplan.getGrade() == 2) {
+            teachplanMapper.deleteById(teachplanId);
+            teachplanMediaMapper.deleteByTeachplanId(teachplanId);
+        }
+
+    }
+
+    /**
+     * 将课程计划下移：需要找到下一个排序号更大的课程计划，并交换两个课程计划的排序号
+     * @param teachplanId 课程计划id
+     */
+    @Override
+    public void moveDownTeachplan(Long teachplanId) {
+        // 1.查询当前课程计划：可能是大章节或小章节
+        Teachplan current = teachplanMapper.selectById(teachplanId);
+        if (current == null) {
+            throw new XueChengPlusException("当前课程计划不存在");
+        }
+        // 2. 查询相邻节点（上移找prev，下移找next）
+        Teachplan adjacent = teachplanMapper.findNext(
+                current.getCourseId(),
+                current.getGrade(),
+                current.getOrderby()
+        );
+        // 3. 校验是否可移动
+        if (adjacent == null) {
+            throw new XueChengPlusException("无法移动");
+        }
+        // 4. 交换排序号
+        swapOrderNum(current, adjacent);
+    }
+
+    @Override
+    public void moveUpTeachplan(Long teachplanId) {
+        // 1.查询当前课程计划：可能是大章节或小章节
+        Teachplan current = teachplanMapper.selectById(teachplanId);
+        if (current == null) {
+            throw new XueChengPlusException("当前课程计划不存在");
+        }
+        // 2. 查询相邻节点（上移找prev，下移找next）
+        Teachplan adjacent = teachplanMapper.findPrev(
+                current.getCourseId(),
+                current.getGrade(),
+                current.getOrderby()
+        );
+        // 3. 校验是否可移动
+        if (adjacent == null) {
+            throw new XueChengPlusException("无法移动");
+        }
+        // 4. 交换排序号
+        swapOrderNum(current, adjacent);
+    }
+
+
+    private void swapOrderNum(Teachplan current, Teachplan adjacent) {
+        Integer temp = current.getOrderby();
+        current.setOrderby(adjacent.getOrderby());
+        adjacent.setOrderby(temp);
+        teachplanMapper.updateById(current);
+        teachplanMapper.updateById(adjacent);
     }
 
 //    private int getTeachplanCount(long courseId, long parentId) {
@@ -69,4 +161,5 @@ public class TeachplanServiceImpl implements TeachplanService {
 //        Integer count = teachplanMapper.selectCount(queryWrapper);
 //        return count;
 //    }
+
 }

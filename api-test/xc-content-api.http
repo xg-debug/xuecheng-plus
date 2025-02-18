@@ -105,3 +105,12 @@ Content-Type: application/json
   "status" : null,
   "teachPlanId" : 240
 }
+
+### 删除课程计划 大章节下有小章节
+DELETE {{content_host}}/content/teachplan/43
+
+### 删除课程计划 大章节下没有小章节
+DELETE {{content_host}}/content/teachplan/289
+
+### 删除课程计划 删除小章节
+DELETE {{content_host}}/content/teachplan/290

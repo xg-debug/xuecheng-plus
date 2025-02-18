@@ -3,6 +3,7 @@ package com.xuecheng.base.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Slf4j
 @ControllerAdvice
@@ -53,5 +56,15 @@ public class GlobalExceptionHandler {
 
         return new RestErrorResponse(msg);
 
+    }
+
+    @ResponseBody
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<Map<String, Object>> handleBusinessException(BusinessException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("errCode", ex.getErrCode());
+        body.put("errMessage", ex.getErrMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body); // 使用 409 状态码
     }
 }

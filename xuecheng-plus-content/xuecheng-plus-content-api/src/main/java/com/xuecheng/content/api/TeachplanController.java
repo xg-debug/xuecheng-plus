@@ -7,6 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,25 @@ public class TeachplanController {
     @PostMapping("/teachplan")
     public void saveTeachplan(@RequestBody SaveTeachplanDto teachplanDto) {
         teachplanService.saveTeachplan(teachplanDto);
+    }
+
+    @ApiOperation("课程计划删除")
+    @DeleteMapping("/teachplan/{id}")
+    public ResponseEntity<Void> delTeachplan(@PathVariable Long id) {
+        teachplanService.deleteTeachplan(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation("课程计划下移")
+    @PostMapping("/teachplan/movedown/{teachplanId}")
+    public void moveDownTeachplan(@PathVariable Long teachplanId) {
+        teachplanService.moveDownTeachplan(teachplanId);
+    }
+
+    @ApiOperation("课程计划上移")
+    @PostMapping("/teachplan/moveup/{teachplanId}")
+    public void moveUpTeachplan(@PathVariable Long teachplanId) {
+        teachplanService.moveUpTeachplan(teachplanId);
     }
 
 }
