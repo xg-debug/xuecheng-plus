@@ -114,6 +114,7 @@ public class TeachplanServiceImpl implements TeachplanService {
         Teachplan adjacent = teachplanMapper.findNext(
                 current.getCourseId(),
                 current.getGrade(),
+                current.getParentid(),
                 current.getOrderby()
         );
         // 3. 校验是否可移动
@@ -135,6 +136,7 @@ public class TeachplanServiceImpl implements TeachplanService {
         Teachplan adjacent = teachplanMapper.findPrev(
                 current.getCourseId(),
                 current.getGrade(),
+                current.getParentid(),
                 current.getOrderby()
         );
         // 3. 校验是否可移动

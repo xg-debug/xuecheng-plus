@@ -114,7 +114,10 @@
         select * from teachplan
         where course_id = #{courseId}
         and grade = #{grade}
-        and orderby > #{orderby}
+        <if test="grade == 2">
+            and parentid = #{parentid}  <!-- 动态添加 parentid 条件 -->
+        </if>
+        and orderby &gt; #{orderby}
         order by orderby asc
         limit 1
     </select>
@@ -123,7 +126,10 @@
         select * from teachplan
         where course_id = #{courseId}
         and grade = #{grade}
-        and orderby < #{orderby}
+        <if test="grade == 2">
+            and parentid = #{parentid}  <!-- 动态添加 parentid 条件 -->
+        </if>
+        and orderby &lt; #{orderby}
         order by orderby desc
         limit 1
     </select>

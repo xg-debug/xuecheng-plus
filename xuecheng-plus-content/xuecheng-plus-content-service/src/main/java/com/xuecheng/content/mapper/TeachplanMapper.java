@@ -31,20 +31,21 @@ public interface TeachplanMapper extends BaseMapper<Teachplan> {
     public int getMaxOrderBy(Long courseId);
 
     /**
-     *
+     * 查找下一个课程计划
      * @param courseId
      * @param grade
      * @param orderby
      * @return
      */
-    public Teachplan findNext(@Param("courseId")Long courseId, @Param("grade")Integer grade, @Param("orderby")Integer orderby);
+    public Teachplan findNext(@Param("courseId")Long courseId, @Param("grade")Integer grade, @Param("parentid")Long parentid, @Param("orderby")Integer orderby);
 
     /**
-     *
+     * 查找上一个课程计划
      * @param courseId
      * @param grade
+     * @param parentid
      * @param orderby
      * @return
      */
-    public Teachplan findPrev(@Param("courseId")Long courseId, @Param("grade")Integer grade, @Param("orderby")Integer orderby);
+    public Teachplan findPrev(@Param("courseId")Long courseId, @Param("grade")Integer grade, @Param("parentid")Long parentid, @Param("orderby")Integer orderby);
 }

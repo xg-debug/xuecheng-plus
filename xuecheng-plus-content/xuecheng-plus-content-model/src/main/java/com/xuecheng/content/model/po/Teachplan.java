@@ -70,11 +70,13 @@ public class Teachplan implements Serializable {
     /**
      * 课程标识
      */
+    @TableField("course_id")
     private Long courseId;
 
     /**
      * 课程发布标识
      */
+    @TableField("course_pub_id")
     private Long coursePubId;
 
     /**
@@ -85,18 +87,19 @@ public class Teachplan implements Serializable {
     /**
      * 是否支持试学或预览（试看）
      */
+    @TableField("is_preview")
     private String isPreview;
 
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT, value = "create_date")
     private LocalDateTime createDate;
 
     /**
      * 修改时间
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE, value = "change_date")
     private LocalDateTime changeDate;
 
 
