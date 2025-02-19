@@ -5,9 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
-import com.xuecheng.content.mapper.CourseBaseMapper;
-import com.xuecheng.content.mapper.CourseCategoryMapper;
-import com.xuecheng.content.mapper.CourseMarketMapper;
+import com.xuecheng.content.mapper.*;
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.xuecheng.content.model.dto.EditCourseDto;
@@ -30,13 +28,22 @@ import java.time.LocalDateTime;
 public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
 
     @Resource
-    CourseBaseMapper courseBaseMapper;
+    private CourseBaseMapper courseBaseMapper;
 
     @Resource
-    CourseMarketMapper courseMarketMapper;
+    private CourseMarketMapper courseMarketMapper;
 
     @Resource
-    CourseCategoryMapper courseCategoryMapper;
+    private CourseCategoryMapper courseCategoryMapper;
+
+    @Resource
+    private TeachplanMapper teachplanMapper;
+
+    @Resource
+    private TeachplanMediaMapper teachplanMediaMapper;
+
+    @Resource
+    private CourseTeacherMapper courseTeacherMapper;
 
     @Override
     public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
@@ -199,5 +206,25 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         // 查询课程信息
         CourseBaseInfoDto courseBaseInfo = getCourseBaseInfo(courseId);
         return courseBaseInfo;
+    }
+
+    @Transactional
+    @Override
+    public void deleteCourse(Long courseId) {
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if (courseBase == null) {
+            throw new XueChengPlusException("课程不存在");
+        }
+        if("202002".equals(courseBase.getAuditStatus())) {
+            // 未提交状态才能删除，需要删除基本信息、营销信息、课程计划、课程计划关联信息、课程教师信息
+            // 先删除从表，避免外键约束问题
+            teachplanMapper.deleteByCourseId(courseId);
+            teachplanMediaMapper.deleteByCourseId(courseId);
+            courseTeacherMapper.deleteByCourseId(courseId);
+            courseMarketMapper.deleteById(courseId);
+            courseBaseMapper.deleteById(courseId);
+        } else {
+            throw new XueChengPlusException("当前课程不能删除");
+        }
     }
 }

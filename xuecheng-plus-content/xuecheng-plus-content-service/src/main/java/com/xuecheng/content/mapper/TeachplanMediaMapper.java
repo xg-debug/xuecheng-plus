@@ -18,5 +18,12 @@ public interface TeachplanMediaMapper extends BaseMapper<TeachplanMedia> {
      * @return
      */
     @Delete("delete from teachplan_media where teachplan_id = #{teachplanId}")
-    public int deleteByTeachplanId(Long teachplanId);
+    int deleteByTeachplanId(Long teachplanId);
+
+    /**
+     * 根据课程id删除媒资信息
+     * @param courseId
+     */
+    @Delete("delete from teachplan_media where course_id = #{courseId}")
+    void deleteByCourseId(Long courseId);
 }

@@ -12,6 +12,7 @@ import com.xuecheng.content.service.CourseBaseInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,6 +57,15 @@ public class CourseBaseInfoController {
         //机构id，由于认证系统没有上线暂时硬编码
         Long companyId = 1232141425L;
         return courseBaseInfoService.updateCourse(companyId, editCourseDto);
+    }
+
+    @ApiOperation("删除课程")
+    @DeleteMapping("/course/{courseId}")
+    public ResponseEntity<Void> delCourseBase(@PathVariable Long courseId) {
+        //机构id，由于认证系统没有上线暂时硬编码
+        Long companyId = 1232141425L;
+        courseBaseInfoService.deleteCourse(courseId);
+        return ResponseEntity.ok().build();
     }
 
 }

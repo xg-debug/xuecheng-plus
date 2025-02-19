@@ -42,4 +42,12 @@ public interface CourseBaseInfoService {
      * @return
      */
     CourseBaseInfoDto updateCourse(Long companyId, EditCourseDto editCourseDto);
+
+    /**
+     * 删除课程
+     * 课程的审核状态为未提交时方可删除。
+     * 删除课程需要删除课程相关的基本信息、营销信息、课程计划、课程教师信息。
+     * @param courseId 课程id
+     */
+    void deleteCourse(Long courseId);
 }
