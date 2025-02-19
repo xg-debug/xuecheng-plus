@@ -1,28 +1,19 @@
-package com.xuecheng.content.model.po;
+package com.xuecheng.content.model.dto;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
-/**
- * <p>
- * 课程-教师关系表
- * </p>
- *
- * @author xg
- */
 @Data
-@TableName("course_teacher")
-public class CourseTeacher implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+@ApiModel(value="EditCourseTeacherDto", description="修改教师信息")
+public class EditCourseTeacherDto {
 
     /**
      * 主键
      */
-    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -53,8 +44,5 @@ public class CourseTeacher implements Serializable {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createDate;
-
-
 }
