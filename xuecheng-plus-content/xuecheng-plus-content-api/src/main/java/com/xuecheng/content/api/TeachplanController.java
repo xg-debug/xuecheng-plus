@@ -52,4 +52,9 @@ public class TeachplanController {
         teachplanService.moveUpTeachplan(teachplanId);
     }
 
+    @ApiOperation("课程计划添加视频")
+    @PostMapping("/teachplan/association/media")
+    public void moveUpTeachplan() {
+    }
+
 }
