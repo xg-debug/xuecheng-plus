@@ -89,4 +89,11 @@ public interface MediaFileService {
      * @return
      */
     public File downloadFileFromMinIO(String bucket, String objectName);
+
+    /**
+     * 根据文件标识拿到媒资文件
+     * @param mediaId
+     * @return
+     */
+    public MediaFiles getFileById(String mediaId);
 }
