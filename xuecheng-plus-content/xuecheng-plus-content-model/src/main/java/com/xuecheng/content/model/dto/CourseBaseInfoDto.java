@@ -5,9 +5,6 @@ import lombok.Data;
 
 /**
  * @description 课程基本信息dto
- * @author Mr.M
- * @date 2022/9/7 17:44
- * @version 1.0
  */
 @Data
 public class CourseBaseInfoDto extends CourseBase {
