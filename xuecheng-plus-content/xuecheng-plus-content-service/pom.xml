@@ -65,6 +65,16 @@
             <artifactId>xuecheng-plus-message-sdk</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <!--xxl-job依赖-->
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+        </dependency>
+        <!--freemarker依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

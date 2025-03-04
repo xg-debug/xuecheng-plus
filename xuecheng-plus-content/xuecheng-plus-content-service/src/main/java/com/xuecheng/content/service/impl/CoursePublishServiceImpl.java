@@ -19,37 +19,39 @@ import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.content.service.TeachplanService;
 import com.xuecheng.messagesdk.model.po.MqMessage;
 import com.xuecheng.messagesdk.service.MqMessageService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class CoursePublishServiceImpl implements CoursePublishService {
 
-    @Autowired
+    @Resource
     private CourseBaseMapper courseBaseMapper;
 
-    @Autowired
+    @Resource
     private CourseMarketMapper courseMarketMapper;
 
-    @Autowired
+    @Resource
     private CoursePublishPreMapper coursePublishPreMapper;
 
-    @Autowired
+    @Resource
     private CoursePublishMapper coursePublishMapper;
 
-    @Autowired
+    @Resource
     private CourseBaseInfoService courseBaseInfoService;
 
-    @Autowired
+    @Resource
     private TeachplanService teachplanService;
 
-    @Autowired
+    @Resource
     private MqMessageService mqMessageService;
 
     @Override
