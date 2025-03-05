@@ -1,5 +1,6 @@
 package com.xuecheng.content;
 
+import com.xuecheng.content.model.dto.CoursePreviewDto;
 import com.xuecheng.content.service.CoursePublishService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -41,9 +42,10 @@ public class FreemarkerTest {
         Template template = configuration.getTemplate("course_template.ftl");
 
         // 准备数据
-        coursePublishService.getCoursePreviewInfo(2L);
+        CoursePreviewDto coursePreviewInfo = coursePublishService.getCoursePreviewInfo(2L);
 
         HashMap<String, Object> map = new HashMap<>();
+        map.put("model", coursePreviewInfo);
 
         // 静态化
         // 参数1：模板，参数2：数据类型
@@ -52,7 +54,7 @@ public class FreemarkerTest {
         // 将静态化内容输出到文件中
         InputStream inputStream = IOUtils.toInputStream(content);
         //输出流
-        FileOutputStream outputStream = new FileOutputStream("D:\\develop\\test.html");
+        FileOutputStream outputStream = new FileOutputStream("D:\\develop\\upload\\120.html");
         IOUtils.copy(inputStream, outputStream);
     }
 }
