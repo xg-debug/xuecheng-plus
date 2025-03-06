@@ -18,4 +18,6 @@ public interface MediaServiceClient {
     @RequestMapping(value = "/media/upload/coursefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String uploadFile(@RequestPart("filedata") MultipartFile upload,
                              @RequestPart(value = "objectName", required = false) String objectName);
+
+
 }
