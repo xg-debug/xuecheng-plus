@@ -45,4 +45,11 @@ public class CheckCodeController {
         Boolean isSuccess = picCheckCodeService.verify(key,code);
         return isSuccess;
     }
+
+    @ApiOperation(value = "生成手机验证码", notes = "生成手机验证码")
+    @PostMapping("/phone")
+    public CheckCodeResultDto generatePhoneCheckCode(CheckCodeParamsDto checkCodeParamsDto){
+        return picCheckCodeService.generate(checkCodeParamsDto);
+    }
+
 }

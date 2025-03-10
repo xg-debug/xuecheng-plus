@@ -25,7 +25,6 @@ public class GlobalExceptionHandler {
     public RestErrorResponse customException(XueChengPlusException e) {
         log.error("【系统异常】{}",e.getErrMessage(),e);
         return new RestErrorResponse(e.getErrMessage());
-
     }
 
     @ResponseBody
@@ -34,8 +33,12 @@ public class GlobalExceptionHandler {
     public RestErrorResponse exception(Exception e) {
 
         log.error("【系统异常】{}",e.getMessage(),e);
-
+        e.printStackTrace();
+        if(e.getMessage().equals("不允许访问")){
+            return new RestErrorResponse("您没有操作此功能的权限");
+        }
         return new RestErrorResponse(CommonError.UNKOWN_ERROR.getErrMessage());
+
 
     }
 
@@ -67,4 +70,5 @@ public class GlobalExceptionHandler {
         body.put("errMessage", ex.getErrMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body); // 使用 409 状态码
     }
+
 }

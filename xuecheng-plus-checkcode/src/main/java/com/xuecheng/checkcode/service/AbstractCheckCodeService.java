@@ -7,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * @author Mr.M
- * @version 1.0
  * @description 验证码接口
- * @date 2022/9/29 15:59
  */
 @Slf4j
 public abstract class AbstractCheckCodeService implements CheckCodeService {
