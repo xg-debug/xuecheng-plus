@@ -1,4 +1,4 @@
-package com.xuecheng.content.config;
+package com.xuecheng.learning.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -10,11 +10,12 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
 /**
- * @description 资源服务配置
- */
+ * @author Administrator
+ * @version 1.0
+ **/
 @Configuration
 @EnableResourceServer
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true,prePostEnabled = true)
 public class ResouceServerConfig extends ResourceServerConfigurerAdapter {
 
 
@@ -39,5 +40,6 @@ public class ResouceServerConfig extends ResourceServerConfigurerAdapter {
                 .anyRequest().permitAll()
         ;
     }
+
 
 }

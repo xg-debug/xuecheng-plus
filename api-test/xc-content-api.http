@@ -194,3 +194,7 @@ POST {{checkcode_host}}/checkcode/pic
 
 ### 校验验证码
 POST {{checkcode_host}}/checkcode/verify?key=checkcode:1084e5dd38a94f89ae8351aebaee64ae&code=ET9J
+
+
+### 查询课程发布信息
+GET {{content_host}}/content/r/coursepublish/2
