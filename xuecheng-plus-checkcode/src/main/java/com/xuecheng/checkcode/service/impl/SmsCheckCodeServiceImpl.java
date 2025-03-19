@@ -18,7 +18,7 @@ public class SmsCheckCodeServiceImpl extends AbstractCheckCodeService implements
     @Resource
     private SmsService smsService;
 
-    @Resource(name="NumberLetterCheckCodeGenerator")
+    @Resource(name="NumberCheckCodeGenerator")
     @Override
     public void setCheckCodeGenerator(CheckCodeGenerator checkCodeGenerator) {
         this.checkCodeGenerator = checkCodeGenerator;
