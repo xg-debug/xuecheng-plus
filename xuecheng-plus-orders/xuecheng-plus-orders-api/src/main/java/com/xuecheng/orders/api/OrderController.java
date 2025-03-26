@@ -1,5 +1,6 @@
 package com.xuecheng.orders.api;
 
+import com.alibaba.fastjson.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
@@ -78,23 +79,33 @@ public class OrderController {
             XueChengPlusException.cast("订单已支付，请勿重复支付。");
         }
         // 构造sdk的客户端对象,获得初始化的AlipayClient
-        AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.URL, APP_ID, APP_PRIVATE_KEY, AlipayConfig.FORMAT, AlipayConfig.CHARSET, ALIPAY_PUBLIC_KEY, AlipayConfig.SIGNTYPE);
+        AlipayClient alipayClient = new DefaultAlipayClient(
+                AlipayConfig.URL,
+                APP_ID,
+                APP_PRIVATE_KEY,
+                AlipayConfig.FORMAT,
+                AlipayConfig.CHARSET,
+                ALIPAY_PUBLIC_KEY,
+                AlipayConfig.SIGNTYPE
+        );
         // 创建API对应的request
         AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();
         //在公共参数中设置回跳和通知地址
         alipayRequest.setReturnUrl("http://domain.com/CallBack/return_url.jsp");
-        alipayRequest.setNotifyUrl("http://tjxt-user-t.itheima.net/xuecheng/orders/paynotify");
-        alipayRequest.setBizContent("{" +
-                " \"out_trade_no\":\""+payRecord.getPayNo()+"\"," +
-                " \"total_amount\":\""+payRecord.getTotalPrice()+"\"," +
-                " \"subject\":\""+payRecord.getOrderName()+"\"," +
-                " \"product_code\":\"QUICK_WAP_PAY\"" +
-                " }");//填充业务参数
+        alipayRequest.setNotifyUrl("http://qpy5s5.natappfree.cc/orders/receivenotify");
+
+        Map<String, String> bizContent = new HashMap<>();
+        bizContent.put("out_trade_no", payRecord.getPayNo().toString());
+        bizContent.put("total_amount", String.format("%.2f", payRecord.getTotalPrice()));
+        bizContent.put("subject", payRecord.getOrderName());
+        bizContent.put("product_code", "JSAPI_PAY");
+        alipayRequest.setBizContent(JSON.toJSONString(bizContent));
 
         String form = "";
         try {
             form = alipayClient.pageExecute(alipayRequest).getBody();
         } catch (AlipayApiException e) {
+            log.error("支付宝接口调用失败，payNo: {}", payNo, e);
             e.printStackTrace();
         }
         httpResponse.setContentType("text/html;charset=" + AlipayConfig.CHARSET);

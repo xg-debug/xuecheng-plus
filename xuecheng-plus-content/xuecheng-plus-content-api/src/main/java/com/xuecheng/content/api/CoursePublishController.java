@@ -67,18 +67,22 @@ public class CoursePublishController {
         coursePublishService.publish(companyId,courseId);
     }
 
-//    @ApiOperation("查询课程发布信息")
-//    @ResponseBody
-//    @GetMapping("/r/coursepublish/{courseId}")
-//    public CoursePublish getCoursePublish(@PathVariable("courseId") Long courseId) {
-//        CoursePublish coursePublish = coursePublishService.getCoursePublish(courseId);
-//        return coursePublish;
-//    }
+    /**
+     * 此接口主要提供其它微服务远程调用，所以此接口不用授权，本项目标记此类接口统一以 /r开头。
+     * @param courseId 课程Id
+     */
+    @ApiOperation("查询课程发布信息")
+    @ResponseBody
+    @GetMapping("/r/coursepublish/{courseId}")
+    public CoursePublish getCoursePublish(@PathVariable("courseId") Long courseId) {
+        CoursePublish coursePublish = coursePublishService.getCoursePublish(courseId);
+        return coursePublish;
+    }
 
-    @ApiOperation("获取课程发布信息")
+    @ApiOperation("查询课程预览信息")
     @ResponseBody
     @GetMapping("/course/whole/{courseId}")
-    public CoursePreviewDto getCoursePublish(@PathVariable("courseId") Long courseId) {
+    public CoursePreviewDto queryCoursePublish(@PathVariable("courseId") Long courseId) {
         //查询课程发布信息
         CoursePublish coursePublish = coursePublishService.getCoursePublish(courseId);
         if (coursePublish == null) {

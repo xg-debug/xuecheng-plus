@@ -34,6 +34,7 @@ public class ReceivePayNotifyService {
     // 监听消息队列接收支付结果通知
     @RabbitListener(queues = PayNotifyConfig.PAYNOTIFY_QUEUE)
     public void receive(Message message, Channel channel) {
+        // 模拟延时
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
@@ -50,9 +51,9 @@ public class ReceivePayNotifyService {
         // 这里只处理支付结果通知
         if(PayNotifyConfig.MESSAGE_TYPE.equals(messageType) && "60201".equals(businessKey2)) {
             // 选课记录id
-            String choosecourseId = mqMessage.getBusinessKey1();
-            boolean b = myCourseTablesService.saveChooseCourseSuccess(choosecourseId);
-            if(!b) {
+            String chooseCourseId = mqMessage.getBusinessKey1();
+            boolean success  = myCourseTablesService.saveChooseCourseSuccess(chooseCourseId);
+            if(!success ) {
                 //添加选课失败，抛出异常，消息重回队列
                 XueChengPlusException.cast("收到支付结果，添加选课失败");
             }

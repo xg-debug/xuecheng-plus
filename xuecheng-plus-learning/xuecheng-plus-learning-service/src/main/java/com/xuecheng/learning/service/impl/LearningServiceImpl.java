@@ -8,10 +8,14 @@ import com.xuecheng.learning.feignclient.MediaServiceClient;
 import com.xuecheng.learning.model.dto.XcCourseTablesDto;
 import com.xuecheng.learning.service.LearningService;
 import com.xuecheng.learning.service.MyCourseTablesService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
+@Slf4j
+@Service
 public class LearningServiceImpl implements LearningService {
 
     @Resource
@@ -26,7 +30,7 @@ public class LearningServiceImpl implements LearningService {
     @Override
     public RestResponse<String> getVideo(String userId, Long courseId, Long teachplanId, String mediaId) {
         // 查询课程信息
-        CoursePublish coursepublish = contentServiceClient.getCoursepublish(courseId);
+        CoursePublish coursepublish = contentServiceClient.getCoursePublish(courseId);
         if(coursepublish == null) {
             XueChengPlusException.cast("课程信息不存在");
         }

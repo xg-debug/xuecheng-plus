@@ -48,9 +48,11 @@ public class CourseBaseInfoController {
     @ApiOperation("新增课程接口")
     @PostMapping("/course")
     public CourseBaseInfoDto createCourseBase(@RequestBody @Validated({ValidationGroups.Inster.class}) AddCourseDto addCourseDto) {
-        //机构id，由于认证系统没有上线暂时硬编码
-        Long companyId = 1232141425L;
-        return courseBaseInfoService.createCourseBase(companyId, addCourseDto);
+        //取出用户身份
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        //机构id
+        String companyId = user.getCompanyId();
+        return courseBaseInfoService.createCourseBase(Long.parseLong(companyId), addCourseDto);
     }
 
     @ApiOperation("根据课程id查询课程基础信息")
@@ -62,16 +64,20 @@ public class CourseBaseInfoController {
     @ApiOperation("修改课程基础信息")
     @PutMapping("/course")
     public CourseBaseInfoDto modifyCourseBase(@RequestBody @Validated EditCourseDto editCourseDto) {
-        //机构id，由于认证系统没有上线暂时硬编码
-        Long companyId = 1232141425L;
-        return courseBaseInfoService.updateCourse(companyId, editCourseDto);
+        //取出用户身份
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        //机构id
+        String companyId = user.getCompanyId();
+        return courseBaseInfoService.updateCourse(Long.parseLong(companyId), editCourseDto);
     }
 
     @ApiOperation("删除课程")
     @DeleteMapping("/course/{courseId}")
     public ResponseEntity<Void> delCourseBase(@PathVariable Long courseId) {
-        //机构id，由于认证系统没有上线暂时硬编码
-        Long companyId = 1232141425L;
+        //取出用户身份
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        //机构id
+        String companyId = user.getCompanyId();
         courseBaseInfoService.deleteCourse(courseId);
         return ResponseEntity.ok().build();
     }

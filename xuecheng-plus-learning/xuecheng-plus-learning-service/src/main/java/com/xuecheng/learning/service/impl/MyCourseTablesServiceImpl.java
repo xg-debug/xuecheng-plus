@@ -40,7 +40,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
     @Override
     public XcChooseCourseDto addChooseCourse(String userId, Long courseId) {
         // 1.查询课程信息
-        CoursePublish coursepublish = contentServiceClient.getCoursepublish(courseId);
+        CoursePublish coursepublish = contentServiceClient.getCoursePublish(courseId);
         // 课程收费标准
         String charge = coursepublish.getCharge();
         // 选课记录
@@ -136,19 +136,32 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
 
     // 添加免费课程,免费课程加入选课记录表、我的课程表
     public XcChooseCourse addFreeCourse(String userId, CoursePublish coursepublish) {
-//        XcChooseCourse xcChooseCourse = chooseCourseMapper.selectOne(new LambdaQueryWrapper<XcChooseCourse>().eq(XcChooseCourse::getUserId, userId).eq(XcChooseCourse::getCourseId, coursepublish.getId()));
-//        if(xcChooseCourse != null) {
-//            XueChengPlusException.cast("请勿重复选课");
-//        }
-//        // 选课记录完成且未过期可以添加课程表
-//        XcChooseCourse chooseCourse = null;
-//        String charge = coursepublish.getCharge();
-//        if("201000".equals(charge)) {
-//            chooseCourseMapper.insert();
-//            courseTablesMapper.insert();
-//        }
-//        return chooseCourse;
-        return null;
+        // 查询选课记录表是否存在免费的且选课成功的订单
+        LambdaQueryWrapper<XcChooseCourse> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(XcChooseCourse::getUserId, userId)
+                .eq(XcChooseCourse::getCourseId, coursepublish.getId())
+                .eq(XcChooseCourse::getOrderType, "700001")//免费课程
+                .eq(XcChooseCourse::getStatus, "701001");//选课成功
+        List<XcChooseCourse> chooseCourseList = chooseCourseMapper.selectList(queryWrapper);
+        if(chooseCourseList != null && chooseCourseList.size() > 0) {
+            return chooseCourseList.get(0);
+        }
+        // 添加选课记录信息
+        XcChooseCourse xcChooseCourse = new XcChooseCourse();
+        xcChooseCourse.setCourseId(coursepublish.getId());
+        xcChooseCourse.setCourseName(coursepublish.getName());
+        xcChooseCourse.setCoursePrice(0f);// 免费课程价格为0
+        xcChooseCourse.setUserId(userId);
+        xcChooseCourse.setCompanyId(coursepublish.getCompanyId());
+        xcChooseCourse.setOrderType("700001");// 免费课程
+        xcChooseCourse.setCreateDate(LocalDateTime.now());
+        xcChooseCourse.setStatus("701001");// 选课成功
+        xcChooseCourse.setValidDays(365);// 免费课程默认365
+        xcChooseCourse.setValidtimeStart(LocalDateTime.now());
+        xcChooseCourse.setValidtimeEnd(LocalDateTime.now().plusDays(365));
+        chooseCourseMapper.insert(xcChooseCourse);
+
+        return xcChooseCourse;
     }
 
     // 添加收费课程
@@ -207,7 +220,6 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
         xcCourseTablesNew.setCreateDate(xcChooseCourse.getCreateDate());
         xcCourseTablesNew.setValidtimeStart(xcChooseCourse.getValidtimeStart());
         xcCourseTablesNew.setValidtimeEnd(xcChooseCourse.getValidtimeEnd());
-        xcCourseTablesNew.setCourseType(xcChooseCourse.getOrderType());
 
 
         courseTablesMapper.insert(xcCourseTablesNew);

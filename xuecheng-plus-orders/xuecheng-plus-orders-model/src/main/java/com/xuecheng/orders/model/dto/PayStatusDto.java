@@ -20,4 +20,5 @@ public class PayStatusDto {
     String app_id;
     //total_amount
     String total_amount;
+
 }

@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * @author Mr.M
- * @version 1.0
  * @description 我的学习接口
- * @date 2022/10/27 8:59
  */
 @Api(value = "学习过程管理接口", tags = "学习过程管理接口")
 @Slf4j

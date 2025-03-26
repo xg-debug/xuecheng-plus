@@ -36,13 +36,13 @@ public class PayNotifyConfig implements ApplicationContextAware {
 
     // 支付通知队列，且持久化
     @Bean(PAYNOTIFY_QUEUE)
-    public Queue course_publish_queue() {
+    public Queue paynotify_queue() {
         return QueueBuilder.durable(PAYNOTIFY_QUEUE).build();
     }
 
     // 交换机和支付通知队列绑定
     @Bean()
-    public Binding binding_course_publish_queue(@Qualifier(PAYNOTIFY_QUEUE) Queue queue, @Qualifier(PAYNOTIFY_EXCHANGE_FANOUT) FanoutExchange exchange) {
+    public Binding binding_paynotify_queue(@Qualifier(PAYNOTIFY_QUEUE) Queue queue, @Qualifier(PAYNOTIFY_EXCHANGE_FANOUT) FanoutExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange);
     }
 
