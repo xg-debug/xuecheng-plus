@@ -27,6 +27,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     DaoAuthenticationProviderCustom daoAuthenticationProviderCustom;
 
+    // 认证
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(daoAuthenticationProviderCustom);
@@ -44,7 +45,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    //配置安全拦截机制
+    // 授权
+    // 配置安全拦截机制
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http

@@ -2,15 +2,18 @@ package com.xuecheng.ucenter.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.xuecheng.ucenter.mapper.XcMenuMapper;
 import com.xuecheng.ucenter.mapper.XcUserMapper;
 import com.xuecheng.ucenter.mapper.XcUserRoleMapper;
 import com.xuecheng.ucenter.model.dto.AuthParamsDto;
 import com.xuecheng.ucenter.model.dto.XcUserExt;
+import com.xuecheng.ucenter.model.po.XcMenu;
 import com.xuecheng.ucenter.model.po.XcUser;
 import com.xuecheng.ucenter.model.po.XcUserRole;
 import com.xuecheng.ucenter.service.AuthService;
-import com.xuecheng.ucenter.service.WxAuthService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -21,21 +24,24 @@ import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 微信扫码认证
  */
 @Slf4j
 @Service("wx_authservice")
-public class WxAuthServiceImpl implements AuthService, WxAuthService {
+public class WxAuthServiceImpl implements AuthService {
 
     @Autowired
     private XcUserMapper xcUserMapper;
 
     @Autowired
-    XcUserRoleMapper xcUserRoleMapper;
+    private XcUserRoleMapper xcUserRoleMapper;
+
+    @Autowired
+    private XcMenuMapper xcMenuMapper;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -51,27 +57,42 @@ public class WxAuthServiceImpl implements AuthService, WxAuthService {
 
     @Override
     public XcUserExt execute(AuthParamsDto authParamsDto) {
-        return null;
-    }
-
-    @Override
-    public XcUser wxAuth(String code){
-        // 1.收到code调用微信接口申请access_token
+        // 1.获取微信授权码
+        Map<String, Object> payload = authParamsDto.getPayload();
+        String code = (String) payload.get("code");
+        if(StringUtils.isEmpty(code)) {
+            throw new RuntimeException("微信授权码不能为空");
+        }
+        // 2.调用微信接口获取access_token和openid
         Map<String, String> access_token_map = getAccess_token(code);
         if(access_token_map == null){
             return null;
         }
-        System.out.println(access_token_map);
-        String openid = access_token_map.get("openid");
         String access_token = access_token_map.get("access_token");
-        //2. 获取用户信息
+        String openid = access_token_map.get("openid");
+
+        // 3.获取微信用户信息
         Map<String, String> userInfo = getUserInfo(access_token, openid);
         if(userInfo == null){
             return null;
         }
         // 3.将用户信息保存到数据库
         XcUser xcUser = currentProxy.addWxUser(userInfo);
-        return xcUser;
+        XcUserExt xcUserExt = new XcUserExt();
+        BeanUtils.copyProperties(xcUser, xcUserExt);
+        // 3.1查询用户权限
+        List<XcMenu> xcMenus = xcMenuMapper.selectPermissionByUserId(xcUser.getId());
+        List<String> permissions = new ArrayList<>();
+        if(xcMenus.size()<=0){
+            // 用户权限,如果不加则报Cannot pass a null GrantedAuthority collection
+            permissions.add("p1");
+        } else {
+            xcMenus.forEach(menu->{
+                permissions.add(menu.getCode());
+            });
+        }
+        xcUserExt.setPermissions(permissions);
+        return xcUserExt;
     }
 
     /**
@@ -90,6 +111,11 @@ public class WxAuthServiceImpl implements AuthService, WxAuthService {
         log.info("调用微信接口申请access_token: 返回值:{}", result);
 
         Map<String,String> resultMap = JSON.parseObject(result, Map.class);
+        if (resultMap.containsKey("errcode")) {
+            throw new RuntimeException(String.format("微信认证失败：errcode:%s,errmsg:%s",
+                    resultMap.get("errcode"),
+                    resultMap.get("errmsg")));
+        }
         return resultMap;
     }
 
@@ -106,7 +132,7 @@ public class WxAuthServiceImpl implements AuthService, WxAuthService {
         log.info("调用微信接口申请access_token, url:{}", wxUrl);
         ResponseEntity<String> exchange = restTemplate.exchange(wxUrl, HttpMethod.POST, null, String.class);
         //防止乱码进行转码
-        String result = new     String(exchange.getBody().getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
+        String result = new String(exchange.getBody().getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
         log.info("调用微信接口申请access_token: 返回值:{}", result);
         Map<String,String> resultMap = JSON.parseObject(result, Map.class);
 
@@ -120,7 +146,10 @@ public class WxAuthServiceImpl implements AuthService, WxAuthService {
      */
     @Transactional
     public XcUser addWxUser(Map userInfo_map) {
-        String unionid = userInfo_map.get("unionid").toString();
+        String unionid = (String) userInfo_map.get("unionid");
+        if(unionid == null) {
+            throw new RuntimeException("微信用户unionid缺失");
+        }
         //根据unionid查询数据库
         XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getWxUnionid, unionid));
         if(xcUser != null){

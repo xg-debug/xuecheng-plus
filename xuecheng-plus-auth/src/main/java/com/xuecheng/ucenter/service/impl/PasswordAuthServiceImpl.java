@@ -49,7 +49,7 @@ public class PasswordAuthServiceImpl implements AuthService {
             //返回空表示用户不存在
             throw new RuntimeException("账号不存在");
         }
-        XcUserExt xcUserExt = new XcUserExt();
+        XcUserExt xcUserExt = new XcUserExt(); // 包含了用户权限
         BeanUtils.copyProperties(user, xcUserExt);
         // 3.校验密码
         String passwordDb = user.getPassword();
